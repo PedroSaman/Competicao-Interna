@@ -1,0 +1,13 @@
+task main(){
+    int c1, l;
+
+    SetSensorLight(IN_3);
+    SetSensorColorFull(IN_2);
+
+    while(1){
+      c1 = SensorValue(IN_2);
+      ClearLine(LCD_LINE1);
+      TextOut(0, LCD_LINE1, "Numero:");
+      NumOut(48, LCD_LINE1, c1);
+    }
+}
