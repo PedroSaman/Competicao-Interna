@@ -1,47 +1,59 @@
-#define direita OUT_A
+       #define direita OUT_A
        #define garra OUT_B
        #define esquerda OUT_C
        #define todos OUT_AC
-       #define sensor1 IN_1
-       #define sensor2 IN_2
-       #define sensor3 IN_3
-       #define sensor4 IN_4
+       #define RGBesquerda IN_1
+       #define Luz IN_2
+       #define RGBdireita IN_3
+       #define Ultra IN_4
        #define potencia 30
-       #define preto   0
-       #define branco  1
-       #define verde   2
-       #define vermelho 3
-       
-       
+       #define preto   3
+       #define nenhuma 4
+       #define verde   1
+       #define vermelho 0
+       #define azul 2
+
        task main () {
-       
-                 int u, c1, c2;
-                 byte num, verde, vermelho, azul, branco, num2, verde2, vermelho2, azul2, branco2;
+
+                 int distancia_da_parede, u, c1, c2, l;
+                 byte num, verde, vermelho, azul, branco, num2, verde2, vermelho2, azul2, branco2, preto;
 
                 // SetSensorColorFull	(sensor);
                 // x = ColorSensorRaw	(sensor, preto);
                 // NumOut	( 0, 0, x);
-                 
-                 SetSensorColorFull(sensor1);
-                 SetSensorColorFull(sensor2);
-                 SetSensorLight(sensor3);
-                 SetSensorLowspeed(sensor4) ;
-                 
-                 u = SensorUS(sensor4);
-                 c1 = ColorSensorRaw	(sensor1, preto);
-                 c2 = ColorSensorRaw	(sensor2, preto);
+
+                 SetSensorColorFull(RGBesquerda);
+                 SetSensorColorFull(RGBdireita);
+                 SetSensorLight(Luz);
+                 SetSensorLowspeed(Ultra) ;
+
+                 distancia_da_parede = SensorUS(Ultra);
+                 l = SensorRaw(Luz);
+                 c1 = SensorValue(RGBesquerda);
+                 c2 = SensorValue(RGBdireita);
 
                   // distância sensor ultrassom  para parede: decidir distância
-                  while (x > 30) {
-                  x = SensorUS(sensor4);
-                  }
-                  Off(todos);
+                  //while (distancia_da_parede > 30) {
+                  //x = SensorUS(sensor4);
+                  //}
+                  //Off(todos);
                   //virar sempre pela esquerda ou direita:
                   //exemplo, se for pela direita: parar a roda direita e ligar a roda esquerda até ele ficar meio q na diagonal, vai reto até uma certa distância,
                   //parar roda esquerda, liga a direita até a diagonal e vai reto até achar a linha preta
+                  //OnFwd(todos, potencia);
 
-                 while (1) {
-                 
+                  OnFwd(todos, 70);
+
+                  while (distancia_da_parede > 30) {
+                    distancia_da_parede = SensorUS(sensor4);
+                    c1 = SensorValue(RGBesquerda);
+                    c2 = SensorValue(RGBdireita);
+                    l = SensorRaw(Luz);
+                    if(l < 35 && c1 == ){
+
+
+                    }
+
                  //se o sensor rgb da direita estiver vendo diferente de preto e o de luz estiver vendo preto: continua {
                  //se os sensores rgb virem diferente de branco {
                  //se ambos virem verde: continua reto, se o sensor da direita vir verde e o da esquerda vir branco: vira direita, se o sensor da esquerda vir verde e o da direita vir branco: vira esquerda}
@@ -57,13 +69,13 @@
                  //caso contrário, se sensor esquerdo vir azul { vai pra esquerda } }
                  //caso contrário, se um sensor vir uma cor e o outro outra cor: vei reto até chegar na plataforma colorida
                  // }
-                 
+
 
                  ClearLine(LCD_LINE1);
                  TextOut(0, LCD_LINE1, "COLOR:");
                  NumOut(48, LCD_LINE1, branco);
-                 
 
 
-       
+
+
        }
