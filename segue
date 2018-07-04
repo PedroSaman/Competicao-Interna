@@ -1,0 +1,138 @@
+      #define direita OUT_A
+       #define garra OUT_B
+       #define esquerda OUT_C
+       #define todos OUT_AC
+       #define RGBesquerda IN_1
+       #define GYRO IN_2
+       #define RGBdireita IN_3
+       #define Ultra IN_4
+       #define potencia 50
+       #define preto   1
+       #define branco 6
+       #define verde   3
+       #define vermelho 5
+       #define azul 2
+       #define angulo 95
+
+sub GetAngle1(float degrees){
+
+                 float angle = 0, gyro = 0;
+                 unsigned long time, prev_time;
+                 time = CurrentTick();
+                 while(angle < degrees){
+                 prev_time = time;
+                 time = CurrentTick();
+                 gyro = SensorHTGyro(GYRO);
+                 angle += gyro * (time - prev_time)/1000.0;
+
+                 }
+}
+
+sub GetAngle2(float degrees){
+
+                 float angle = 0, gyro = 0;
+                 unsigned long time, prev_time;
+                 time = CurrentTick();
+                 while(angle > degrees){
+                 prev_time = time;
+                 time = CurrentTick();
+                 gyro = SensorHTGyro(GYRO);
+                 angle += gyro * (time - prev_time)/1000.0;
+
+                 }
+}
+
+task main () {
+
+     int C1, C2, valor, distancia_parede;
+
+     SetSensorColorFull(RGBesquerda);
+     SetSensorColorFull(RGBdireita);
+     SetSensorHTGyro(GYRO);
+     SetSensorLowspeed(Ultra) ;
+
+     while(1){
+              //segue linha
+
+                 ClearLine(LCD_LINE1);
+                 TextOut(0, LCD_LINE1, "procurando:");
+              C1 = Sensor(RGBesquerda);
+              C2 = Sensor(RGBdireita);
+              valor = (C1 - C2)*10;
+              OnFwd(esquerda, potencia+valor);
+              OnFwd(direita, potencia-valor);
+              
+              distancia_parede = SensorUS(Ultra);
+              
+              //achou parede
+              while (distancia_parede < 20) {
+                 ClearLine(LCD_LINE1);
+                 TextOut(0, LCD_LINE1, "achei parede:");
+
+                 float gyro;
+                 long rota=0, offset;
+                 Off(todos);
+
+                 // gira 1 para direita
+                 OnFwd(esquerda, potencia);
+                 OnFwd(direita, -potencia);
+                 distancia_parede = SensorUS(Ultra);
+                 GetAngle1(angulo);
+                 Off(todos);
+                 OnFwd(todos, potencia);
+
+                 // primeira reta
+                 offset = MotorRotationCount (esquerda);
+                 while (rota < 900) {
+                 rota = MotorRotationCount (esquerda) - offset;
+                 }
+                 Off(todos);
+
+                // gira 1 esquerda
+                 OnFwd(esquerda, -potencia);
+                 OnFwd(direita, potencia);
+                 GetAngle2(-angulo);
+                 Off(todos);
+                 OnFwd(todos, potencia);
+                 
+                // segunda reta
+                 rota = 0;
+                 offset = MotorRotationCount (esquerda);
+                 while (rota < 2100) {
+                 rota = MotorRotationCount (esquerda) - offset;
+                 }
+                 Off(todos);
+                 
+                 // gira 2 esquerda
+                 OnFwd(esquerda, -potencia);
+                 OnFwd(direita, potencia);
+                 GetAngle2(-angulo);
+                 Off(todos);
+                 OnFwd(todos, potencia);
+                 
+                 // anda até o preto
+                 C1 = Sensor(RGBesquerda);
+                 while (C1!=preto) {
+                 
+                 ClearLine(LCD_LINE1);
+                 TextOut(0, LCD_LINE1, "entrou:");
+                 OnFwd(todos, potencia);
+                 C1 = Sensor(RGBesquerda);
+
+                 }
+
+                 //gira 2 direta
+                 OnFwd(esquerda, potencia);
+                 OnFwd(direita, -potencia);
+                 distancia_parede = SensorUS(Ultra);
+                 GetAngle1(angulo-15);
+                 Off(todos);
+                 OnFwd(todos, potencia);
+                  
+                 
+         }
+         
+         Off(todos);
+
+       }
+}
